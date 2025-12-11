@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-width, initial-scale=1.0"/>
+  <title>My Profile</title>
+  <link rel="icon" type="image/png" href="Images/icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background: url("Images/bg2.jpg") no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+    }
+
+    .background-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #4B3621;
+      margin: 0 auto 15px;
+      object-fit: cover; /* Ensures the image fills the circle */
+    }
+
+    .btn-coffee {
+      background: linear-gradient(to right, #4B3621, #A9746E);
+      color: #fff;
+      border: none;
+      font-weight: 500;
+    }
+
+    .btn-coffee:hover {
+      background: linear-gradient(to right, #3b281b, #86534e);
+      color: #fff;
+    }
+
+    .skill-tag {
+      display: inline-block;
+      background: #4B3621;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      margin: 5px;
+      font-size: 0.9rem;
+    }
+    
+    /* Style for the file upload area */
+    .avatar-upload-area {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .avatar-upload-area:hover .overlay-text {
+        opacity: 1;
+    }
+    .overlay-text {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="background-overlay"></div>
+  <div class="content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="profile-card">
+            <div class="profile-header">
+              
+              <div class="avatar-upload-area">
+                <img id="profileAvatar" src="Images/default-avatar.png" alt="Profile Avatar" class="profile-avatar">
+                <input type="file" id="avatarFile" accept="image/*" style="display: none;">
+                <div class="overlay-text" onclick="document.getElementById('avatarFile').click()">
+                    Change Photo
+                </div>
+              </div>
+              <h2 id="profileName">User Profile</h2>
+              <p id="profileRole" class="text-muted"></p>
+            </div>
+
+            <div id="jobSeekerProfile">
+              <h4>Personal Information</h4>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="profileFullName">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="profileEmail" readonly>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Skills</label>
+                <input type="text" class="form-control" id="profileSkills" placeholder="Add skills separated by commas">
+                <div id="skillsDisplay" class="mt-2"></div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Experience</label>
+                <textarea class="form-control" id="profileExperience" rows="3"></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Education</label>
+                <textarea class="form-control" id="profileEducation" rows="3"></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Preferred Job Types</label>
+                <input type="text" class="form-control" id="profileJobTypes" placeholder="Add preferred job types separated by commas">
+                <div id="jobTypesDisplay" class="mt-2"></div>
+              </div>
+            </div>
+
+            <div id="companyProfile" style="display: none;">
+              <h4>Company Information</h4>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Company Name</label>
+                  <input type="text" class="form-control" id="companyName">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="companyEmail" readonly>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Industry</label>
+                  <input type="text" class="form-control" id="companyIndustry">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Company Size</label>
+                  <input type="text" class="form-control" id="companySize">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Company Description</label>
+                <textarea class="form-control" id="companyDescription" rows="4"></textarea>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="index.html" class="btn btn-coffee">Back to Home</a>
+              <button id="saveProfile" class="btn btn-coffee">Save Profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let avatarBase64 = null; // Variable to hold the new avatar data
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      
+      if (!currentUser) {
+        alert('Please login to view your profile');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Load current avatar (Image or default)
+      const profileAvatarElement = document.getElementById('profileAvatar');
+      // Use the stored avatar data if available, otherwise use default image
+      profileAvatarElement.src = currentUser.avatar || 'Images/default-avatar.png';
+      
+      // Populate profile data
+      document.getElementById('profileName').textContent = currentUser.username;
+      document.getElementById('profileRole').textContent = currentUser.role === 'jobseeker' ? 'Job Seeker' : 
+                                                         currentUser.role === 'company' ? 'Company' : 'Administrator';
+      
+      if (currentUser.role === 'jobseeker') {
+        document.getElementById('jobSeekerProfile').style.display = 'block';
+        document.getElementById('companyProfile').style.display = 'none';
+        
+        // Populate job seeker fields
+        document.getElementById('profileFullName').value = currentUser.profile?.fullName || '';
+        document.getElementById('profileEmail').value = currentUser.email || '';
+        
+        // Skills
+        const skills = currentUser.profile?.skills || [];
+        document.getElementById('profileSkills').value = skills.join(', ');
+        displayTags('skillsDisplay', skills, 'skill-tag');
+        
+        document.getElementById('profileExperience').value = currentUser.profile?.experience || '';
+        document.getElementById('profileEducation').value = currentUser.profile?.education || '';
+        
+        // Job types
+        const jobTypes = currentUser.profile?.preferredJobTypes || [];
+        document.getElementById('profileJobTypes').value = jobTypes.join(', ');
+        displayTags('jobTypesDisplay', jobTypes, 'skill-tag');
+        
+      } else if (currentUser.role === 'company') {
+        document.getElementById('jobSeekerProfile').style.display = 'none';
+        document.getElementById('companyProfile').style.display = 'block';
+        
+        // Populate company fields
+        document.getElementById('companyName').value = currentUser.profile?.companyName || '';
+        document.getElementById('companyEmail').value = currentUser.email || '';
+        document.getElementById('companyIndustry').value = currentUser.profile?.industry || '';
+        document.getElementById('companySize').value = currentUser.profile?.companySize || '';
+        document.getElementById('companyDescription').value = currentUser.profile?.description || '';
+      }
+      
+      // --- AVATAR FILE HANDLER ---
+      document.getElementById('avatarFile').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            // Display the new image immediately
+            profileAvatarElement.src = e.target.result;
+            // Store the Base64 string for saving
+            avatarBase64 = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      // --- END AVATAR FILE HANDLER ---
+      
+      
+      // Save profile
+      document.getElementById('saveProfile').addEventListener('click', function() {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        
+        if (userIndex !== -1) {
+          
+          // 1. Update Profile Data based on role
+          if (currentUser.role === 'jobseeker') {
+            users[userIndex].profile = {
+              fullName: document.getElementById('profileFullName').value,
+              skills: document.getElementById('profileSkills').value.split(',').map(s => s.trim()).filter(s => s),
+              experience: document.getElementById('profileExperience').value,
+              education: document.getElementById('profileEducation').value,
+              preferredJobTypes: document.getElementById('profileJobTypes').value.split(',').map(j => j.trim()).filter(j => j)
+            };
+          } else if (currentUser.role === 'company') {
+            users[userIndex].profile = {
+              companyName: document.getElementById('companyName').value,
+              industry: document.getElementById('companyIndustry').value,
+              companySize: document.getElementById('companySize').value,
+              description: document.getElementById('companyDescription').value
+            };
+          }
+          
+          // 2. Update Avatar Data
+          if (avatarBase64) {
+             users[userIndex].avatar = avatarBase64;
+          }
+          
+          // 3. Save to localStorage
+          localStorage.setItem('users', JSON.stringify(users));
+          localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+          alert('Profile updated successfully!');
+          
+          // Force a reload of the index to update the avatar badge display immediately
+          window.location.href = 'index.html'; 
+        }
+      });
+      
+      // Function to display tags
+      function displayTags(containerId, tags, tagClass) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        tags.forEach(tag => {
+          if (tag.trim()) {
+            const tagElement = document.createElement('span');
+            tagElement.className = tagClass;
+            tagElement.textContent = tag;
+            container.appendChild(tagElement);
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

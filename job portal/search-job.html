@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Jobs</title>
+  <link rel="icon" type="image/png" href="Images/icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    }
+
+    .video-bg, .video-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    .video-bg {
+      object-fit: cover; 
+    }
+
+    .video-overlay {
+      background-color: rgba(0, 0, 0, 0.5); 
+    }
+
+    h2 {
+      color: #ffffff;
+    }
+
+    .search-bar {
+      max-width: 90%;
+      margin: 30px auto 15px;
+    }
+
+    .job-card {
+      border: 1px solid #e9edf0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      background-color: #f2eae2;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .job-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .job-meta {
+      color: #666;
+      font-size: 0.95rem;
+    }
+    
+    .job-meta strong {
+        color: #4B3621;
+    }
+
+    .view-btn, .apply-btn {
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+    }
+
+    .view-btn {
+      background-color: #A9746E;
+    }
+
+    .view-btn:hover {
+      background-color: #4B3621;
+      box-shadow: 0 4px 10px rgba(255, 0, 0, 0.3);
+    }
+
+    .apply-btn {
+      background-color: #A9746E;
+    }
+
+    .apply-btn:hover {
+      background-color: #4B3621;
+      box-shadow: 0 4px 10px rgba(255, 0, 0, 0.3);
+    }
+
+    .btn-coffee {
+      background: linear-gradient(to right, #4B3621, #A9746E);
+      color: #fff;
+      border: none;
+      font-weight: 500;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-coffee:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(75, 54, 33, 0.4);
+    }
+
+    .fixed-btn {
+      position: fixed;
+      bottom: 130px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .back-btn {
+      left: 20px;
+      background-color: #8d6e63;
+    }
+
+    #btn2 {
+      right: 40px;
+      border-radius: 30px;
+      background: linear-gradient(to right, #5a3f36, #b46e63);
+      transition: background 0.3s ease;
+    }
+
+    #btn2:hover {
+      background: linear-gradient(to right, #4a332c, #a85d54);
+    }
+
+    /* Hide scrollbar styles */
+    #jobsContainer::-webkit-scrollbar,
+    #jobDescriptionPanel::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
+
+    #jobsContainer,
+    #jobDescriptionPanel {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;     /* Firefox */
+    }
+
+    .container-main {
+      display: flex;
+      height: 80vh;
+      gap: 1rem;
+    }
+
+    #jobsContainer {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+
+    #jobDescriptionPanel {
+      flex: 1;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <video autoplay muted loop class="video-bg">
+    <source src="Images/vdo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="video-overlay"></div>
+
+  <h2 class="text-center mb-4">BROWSE AVAILABLE JOBS</h2>
+
+  <div class="container search-bar">
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by title, company, or location...">
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <select id="typeFilter" class="form-select" onchange="filterAndDisplay()">
+                <option value="">Filter by Job Type</option>
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Remote">Remote</option>
+                <option value="Internship">Internship</option>
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <select id="categoryFilter" class="form-select" onchange="filterAndDisplay()">
+                <option value="">Filter by Category</option>
+                <option value="Technology">Technology</option>
+                <option value="Design">Design</option>
+                <option value="Analytics">Analytics</option>
+                <option value="Sales">Sales & Marketing</option>
+                <option value="Finance">Finance</option>
+            </select>
+        </div>
+    </div>
+  </div>
+
+  <div class="container container-main">
+  
+    <div id="jobsContainer"></div>
+
+    <div id="jobDescriptionPanel">
+      <h4 id="descTitle" style="font-weight: bold;"></h4>
+      <p id="descCompany"></p>
+      <p id="descLocation"></p>
+      <p id="descSalary"></p>
+      <hr>
+      <h5 class="text-muted">Job Description:</h5>
+      <pre id="descFull" style="white-space: pre-wrap; font-family: inherit;"></pre>
+      <h5 class="text-muted">Key Requirements:</h5>
+      <pre id="descRequirements" style="white-space: pre-wrap; font-family: inherit;"></pre>
+    </div>
+  </div>
+
+  <a href="index.html" class="btn btn-coffee fixed-btn back-btn">
+    <i class="bi bi-arrow-left-circle me-2"></i>Back To Home
+  </a>
+
+  <a href="applied-job.html" id="btn2" class="btn btn-coffee fixed-btn" style="left: auto;">
+    <i class="bi bi-arrow-left-circle me-2"></i>Applied Job
+  </a>
+
+  <script>
+    let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+const jobsContainer = document.getElementById("jobsContainer");
+const searchInput = document.getElementById("searchInput");
+const typeFilter = document.getElementById("typeFilter");
+const categoryFilter = document.getElementById("categoryFilter");
+
+
+// track currently expanded job
+let currentlyViewingJobId = null;
+
+// display jobs in the container
+function displayJobs(filteredJobs) {
+  jobsContainer.innerHTML = "";
+
+  if (filteredJobs.length === 0) {
+    jobsContainer.innerHTML = "<p class='text-center text-light'>No jobs found matching your criteria.</p>";
+    return;
+  }
+
+  filteredJobs.forEach(job => {
+    // Ensure we display 'N/A' if type/category are missing 
+    const jobType = job.type || 'N/A';
+    const jobCategory = job.category || 'N/A';
+    
+    const jobCard = document.createElement("div");
+    jobCard.className = "job-card";
+    
+    jobCard.innerHTML = `
+      <div class="job-title">${job.title}</div>
+      <div class="job-meta">${job.company} | ${job.location} | <strong>Rs.${job.salary}</strong></div>
+      <p class="text-muted mb-1">
+        <span class="badge bg-secondary">${jobCategory}</span> 
+        <span class="badge bg-secondary">${jobType}</span>
+      </p>
+      
+      <button class="apply-btn" onclick="applyJob(${job.id})">Apply</button>
+      <button class="view-btn" onclick='toggleInlineDescription(${job.id})'>View</button>
+    `;
+    
+    jobsContainer.appendChild(jobCard);
+  });
+}
+
+function toggleInlineDescription(jobId) {
+  const job = jobs.find(j => j.id == jobId);
+  if (!job) return;
+
+  const panel = document.getElementById("jobDescriptionPanel");
+  const title = document.getElementById("descTitle");
+  const company = document.getElementById("descCompany");
+  const location = document.getElementById("descLocation");
+  const salary = document.getElementById("descSalary");
+  const full = document.getElementById("descFull");
+  const requirements = document.getElementById("descRequirements");
+
+  // if same job is clicked again (Hide case)
+  if (currentlyViewingJobId === jobId) {
+    panel.style.display = "none";
+    currentlyViewingJobId = null;
+    return;
+  }
+
+  // update panel content
+  title.textContent = job.title;
+  company.textContent = `Company: ${job.company} (${job.category || 'N/A'})`;
+  location.textContent = `Location: ${job.location} (${job.type || 'N/A'})`;
+  salary.textContent = `Salary: Rs. ${job.salary}`;
+  full.textContent = job.description || 'No description provided.';
+  requirements.textContent = job.requirements || 'Requirements not specified.';
+
+
+  // show panel and update state
+  panel.style.display = "block";
+  currentlyViewingJobId = jobId;
+}
+
+
+// navigate to apply page and store selected job ID
+function applyJob(id) {
+  localStorage.setItem("selectedJobId", id);
+  window.location.href = "apply-job.html";
+}
+
+
+// Filter jobs by search input AND filters
+function filterAndDisplay() {
+  const keyword = searchInput.value.toLowerCase();
+  const selectedType = typeFilter.value;
+  const selectedCategory = categoryFilter.value;
+
+  const filtered = jobs.filter(job => {
+    // 1. Keyword Check (Title, Company, Location)
+    const keywordMatch = job.title.toLowerCase().includes(keyword) ||
+                         job.company.toLowerCase().includes(keyword) ||
+                         job.location.toLowerCase().includes(keyword);
+
+    // 2. Type Check
+    const typeMatch = !selectedType || job.type === selectedType;
+
+    // 3. Category Check
+    const categoryMatch = !selectedCategory || job.category === selectedCategory;
+
+    return keywordMatch && typeMatch && categoryMatch;
+  });
+  
+  // Update the job list view
+  displayJobs(filtered);
+}
+
+// Initial load
+displayJobs(jobs);
+
+// Search as you type
+searchInput.addEventListener("input", filterAndDisplay);
+  </script>
+</body>
+</html>

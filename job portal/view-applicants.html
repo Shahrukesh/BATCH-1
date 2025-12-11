@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Applicants Tracking</title>
+  <link rel="icon" type="image/png" href="Images/icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+      background: url("Images/appliedjob.jpg") center/cover no-repeat fixed #f5f2ed;
+      padding: 2rem;
+    }
+    .background-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(3, 3, 3, 0.688);
+      z-index: 0;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+    .applicant-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      padding: 20px;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-coffee {
+      background: linear-gradient(to right, #4B3621, #A9746E);
+      color: #fff; border: none; font-weight: 500;
+    }
+    .btn-coffee:hover {
+      background: linear-gradient(to right, #3b281b, #86534e);
+    }
+
+    /* Status text styles for visibility */
+    .status-pending { color: #ffc107; font-weight: bold; }
+    .status-accepted { color: #28a745; font-weight: bold; }
+    .status-rejected { color: #dc3545; font-weight: bold; }
+    .status-canceled { color: #6c757d; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="background-overlay"></div>
+  <div class="content">
+    <div class="container mt-5">
+      <h2 class="mb-4 text-white"><i class="bi bi-person-check-fill me-2"></i>Applicants Tracking Dashboard</h2>
+      
+      <div class="alert alert-danger" id="authError" style="display: none;">
+        Access Denied. This page is for **Employers** only.
+      </div>
+      
+      <div id="applicantsContainer" class="row">
+        </div>
+      
+      <div class="text-center mt-4">
+        <a href="posted-jobs.html" class="btn btn-coffee"><i class="bi bi-briefcase-fill me-2"></i>View Posted Jobs</a>
+        <a href="index.html" class="btn btn-coffee"><i class="bi bi-house-fill me-2"></i>Back to Home</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function getJobData() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      
+      // Authorization Check
+      if (!currentUser || currentUser.role !== 'company') {
+        document.getElementById('authError').style.display = 'block';
+        return { authorized: false };
+      }
+      
+      const companyId = currentUser.id;
+      const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+      const applicants = JSON.parse(localStorage.getItem("applicants")) || [];
+
+      // Filter jobs posted by this specific company
+      const postedJobs = jobs.filter(job => job.postedBy == companyId);
+      
+      // Filter applications for those jobs
+      const companyApplicants = applicants.filter(app => postedJobs.some(job => job.id === app.jobId));
+      
+      return { authorized: true, postedJobs, companyApplicants, companyId };
+    }
+
+    function displayDashboard() {
+      const { authorized, postedJobs, companyApplicants } = getJobData();
+      if (!authorized) return;
+
+      const applicantsContainer = document.getElementById("applicantsContainer");
+      applicantsContainer.innerHTML = '';
+      
+      if (postedJobs.length === 0) {
+        applicantsContainer.innerHTML = '<p class="text-white">You have not posted any jobs yet. <a href="post-job.html" class="btn btn-success btn-sm ms-3">Post First Job</a></p>';
+        return;
+      }
+
+      if (companyApplicants.length === 0) {
+        applicantsContainer.innerHTML = '<p class="text-white">No applicants found for your jobs yet. Keep checking!</p>';
+        return;
+      }
+
+      // Group applicants by job title
+      const applicantsByJob = companyApplicants.reduce((acc, app) => {
+        // Find the job title for grouping
+        const job = postedJobs.find(j => j.id === app.jobId) || { title: 'Unknown Job' };
+        const key = job.title;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(app);
+        return acc;
+      }, {});
+
+      for (const jobTitle in applicantsByJob) {
+        const jobGroup = document.createElement("div");
+        jobGroup.classList.add("col-12", "mb-4");
+        jobGroup.innerHTML = `<h4 class="text-white border-bottom pb-2">${jobTitle} (${applicantsByJob[jobTitle].length} Applications)</h4>`;
+        
+        applicantsByJob[jobTitle].forEach(app => {
+            const card = document.createElement("div");
+            card.classList.add("applicant-card", "mb-2");
+            
+            const status = app.status || 'pending';
+            const statusClass = `status-${status}`;
+            
+            card.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">${app.name}</h5>
+                        <p class="mb-1">${app.email} | ${app.phone}</p>
+                        <small>Applied: ${new Date(app.appliedAt).toLocaleDateString()}</small><br>
+                        <small>Status: <strong class="${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</strong></small>
+                    </div>
+                    <button class="btn btn-coffee btn-sm" onclick="viewApplicantInfo(${app.appliedAt})">View Profile</button>
+                </div>
+            `;
+            jobGroup.appendChild(card);
+        });
+        applicantsContainer.appendChild(jobGroup);
+      }
+    }
+
+    function viewApplicantInfo(appliedAt) {
+      localStorage.setItem("viewApplicationId", appliedAt);
+      window.location.href = "info.html";
+    }
+
+    window.onload = displayDashboard;
+  </script>
+</body>
+</html>

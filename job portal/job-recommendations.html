@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recommended Jobs</title>
+  <link rel="icon" type="image/png" href="Images/icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background: url("Images/bg2.jpg") no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+    }
+
+    .background-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .job-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .job-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .job-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #4B3621;
+    }
+
+    .job-meta {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .match-badge {
+      background: #28a745;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+
+    .btn-coffee {
+      background: linear-gradient(to right, #4B3621, #A9746E);
+      color: #fff;
+      border: none;
+      font-weight: 500;
+    }
+
+    .btn-coffee:hover {
+      background: linear-gradient(to right, #3b281b, #86534e);
+      color: #fff;
+    }
+
+    .recommendation-header {
+      color: white;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background-overlay"></div>
+  <div class="content">
+    <div class="container">
+      <h2 class="recommendation-header">Jobs Recommended For You</h2>
+      <div id="recommendedJobsContainer"></div>
+      
+      <div class="text-center mt-4">
+        <a href="index.html" class="btn btn-coffee">Back to Home</a>
+        <a href="search-job.html" class="btn btn-coffee">Browse All Jobs</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      
+      if (!currentUser || currentUser.role !== 'jobseeker') {
+        alert('This page is for job seekers only');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+      // Profile data we rely on
+      const userSkills = currentUser.profile?.skills || [];
+      const preferredJobTypes = currentUser.profile?.preferredJobTypes || [];
+      
+      // Get recommended jobs
+      const recommendedJobs = getRecommendedJobs(jobs, userSkills, preferredJobTypes);
+      displayRecommendedJobs(recommendedJobs);
+      
+      function getRecommendedJobs(jobs, userSkills, preferredJobTypes) {
+        // Pre-process user data for faster matching
+        const seekerKeywords = userSkills.map(s => s.toLowerCase());
+        const seekerPreferredJobTypes = preferredJobTypes.map(t => t.toLowerCase());
+
+        return jobs.map(job => {
+          let score = 0;
+          let matchReasons = [];
+          
+          const jobTitleLower = job.title.toLowerCase();
+          const jobTypeLower = (job.type || '').toLowerCase();
+          const jobCategoryLower = (job.category || '').toLowerCase();
+          const jobRequirementsLower = (job.requirements || '').toLowerCase();
+          
+          // --- SCORING LOGIC ---
+
+          // 1. MATCH by PREFERRED JOB TYPE (Title Keyword Match)
+          seekerPreferredJobTypes.forEach(type => {
+            if (jobTitleLower.includes(type)) {
+              score += 30;
+              matchReasons.push(`Matches job type keyword: ${type}`);
+            }
+          });
+          
+          // 2. MATCH by STRUCTURED JOB TYPE (Full/Part-time/Remote)
+          seekerPreferredJobTypes.forEach(type => {
+            if (jobTypeLower.includes(type)) {
+                score += 20;
+                matchReasons.push(`Matches structured Job Type: ${job.type}`);
+            }
+          });
+
+          // 3. SKILLS MATCH (Check user skills against Job Requirements)
+          seekerKeywords.forEach(skill => {
+            if (jobRequirementsLower.includes(skill.toLowerCase())) {
+              score += 25; // High score for direct skill match
+              matchReasons.push(`Requires key skill: ${skill}`);
+            }
+          });
+          
+          // 4. CATEGORY MATCH (Moderate preference boost)
+          const seekerCategoryPreference = preferredJobTypes.find(type => jobCategoryLower.includes(type.split(' ')[0].toLowerCase()));
+          if (seekerCategoryPreference) {
+            score += 10;
+            matchReasons.push(`Matches preferred category: ${job.category}`);
+          }
+          
+          // --- END SCORING LOGIC ---
+          
+          return {
+            ...job,
+            matchScore: Math.min(100, score), // Cap score at 100%
+            matchReasons
+          };
+        })
+        .filter(job => job.matchScore > 0)
+        .sort((a, b) => b.matchScore - a.matchScore);
+      }
+      
+      function displayRecommendedJobs(jobs) {
+        const container = document.getElementById('recommendedJobsContainer');
+        
+        if (jobs.length === 0) {
+          container.innerHTML = `
+            <div class="job-card text-center">
+              <h4>No recommendations yet</h4>
+              <p>Complete your profile and browse jobs to get personalized recommendations.</p>
+              <a href="user-profile.html" class="btn btn-coffee">Complete Profile</a>
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        jobs.forEach(job => {
+          const jobCard = document.createElement('div');
+          jobCard.className = 'job-card';
+          jobCard.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="job-title">${job.title} <span class="match-badge">${job.matchScore}% Match</span></div>
+                <div class="job-meta">
+                    ${job.company} | ${job.location} | Rs.${job.salary}
+                    <br><small class="text-muted">${job.category || 'N/A'} | ${job.type || 'N/A'}</small>
+                </div>
+                <p class="text-muted mt-2">${job.description.substring(0, 100)}...</p>
+                
+                <div class="match-reasons mt-2">
+                  <small class="text-success">
+                    <strong>Match reasons:</strong> ${job.matchReasons.join(', ')}
+                  </small>
+                </div>
+              </div>
+              <div>
+                <button class="btn btn-coffee btn-sm" onclick="applyJob(${job.id})">Apply</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="viewJobDetails(${job.id})">Details</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(jobCard);
+        });
+      }
+    });
+    
+    function applyJob(id) {
+      localStorage.setItem("selectedJobId", id);
+      window.location.href = "apply-job.html";
+    }
+    
+    function viewJobDetails(id) {
+      const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+      const job = jobs.find(j => j.id == id);
+      
+      if (job) {
+        // Store job details for viewing
+        localStorage.setItem("viewingJob", JSON.stringify(job));
+        window.location.href = "job-details.html";
+      }
+    }
+  </script>
+</body>
+</html>

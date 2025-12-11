@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Portal - Home</title>
+  <link rel="icon" type="image/png" href="Images/icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .overlay {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .glass-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 50px 40px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .glass-card h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    }
+
+    .glass-card p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+
+    .btn-custom {
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      border-radius: 25px;
+    }
+
+    .about-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+      font-size: 0.9rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .container-wrapper {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .user-profile {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+    }
+
+    .user-avatar-placeholder { 
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid white;
+      cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.2); 
+    }
+    
+    .user-avatar-placeholder img { 
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .user-avatar-placeholder span { 
+      font-size: 1.8rem;
+      line-height: 1;
+      color: white;
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      padding: 10px;
+      min-width: 180px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .user-menu.active {
+      display: block;
+    }
+
+    .user-menu a {
+      display: block;
+      padding: 8px 12px;
+      color: #333;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .user-menu a:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <video autoplay muted loop class="video-bg">
+    <source src="Images/video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="overlay"></div>
+
+  <div class="user-profile" id="userProfileContainer" style="display: none;">
+    <div class="position-relative">
+      <div id="userAvatarContainer" class="user-avatar-placeholder">
+        </div>
+      <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+    </div>
+    <div id="userMenu" class="user-menu">
+      <a href="user-profile.html">My Profile</a>
+      <a href="applied-job.html">Applied Jobs</a>
+      <a href="job-recommendations.html">Recommended Jobs</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </div>
+
+  <div class="container-wrapper">
+    <div class="glass-card">
+      <a href="about.html" class="btn btn-outline-light btn-custom about-btn">About Us</a><br>
+      <h1>Welcome to Job Portal</h1>
+      <p>Turning <strong>dreams</strong> into <strong>careers</strong></p>
+      
+      <div id="guestView">
+        <a href="login.html" class="btn btn-light btn-custom me-3">Login / Register</a>
+      </div>
+      
+      <div id="userView" style="display: none;">
+        
+        <a href="search-job.html" class="btn btn-outline-light btn-custom me-3 user-seeker-link" style="display: none;">Browse Jobs</a>
+        <a href="job-recommendations.html" class="btn btn-outline-light btn-custom user-seeker-link" style="display: none;">Recommended Jobs</a>
+        
+        <a href="post-job.html" class="btn btn-light btn-custom me-3 user-company-link" style="display: none;">Post a Job</a>
+        <a href="view-applicants.html" class="btn btn-outline-light btn-custom user-company-link" style="display: none;">View Applicants</a>
+        
+        <a href="admin-dashboard.html" class="btn btn-danger btn-custom user-admin-link" style="display: none;">Admin Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    function checkLoginStatus() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      const guestView = document.getElementById('guestView');
+      const userView = document.getElementById('userView');
+      const profileContainer = document.getElementById('userProfileContainer');
+      const avatarContainer = document.getElementById('userAvatarContainer');
+      
+      // Hide all role-specific links initially
+      document.querySelectorAll('.user-seeker-link, .user-company-link, .user-admin-link').forEach(el => el.style.display = 'none');
+      
+      if (currentUser) {
+        guestView.style.display = 'none';
+        userView.style.display = 'block';
+        profileContainer.style.display = 'block'; // Show profile container
+        
+        // --- AVATAR DISPLAY LOGIC ---
+        avatarContainer.innerHTML = ''; // Clear previous content
+        if (currentUser.avatar) {
+            // Display saved Base64 image
+            avatarContainer.innerHTML = `<img id="userAvatarTrigger" src="${currentUser.avatar}" alt="Avatar">`;
+        } else {
+            // Display emoji placeholder
+            avatarContainer.innerHTML = `<span id="userAvatarTrigger">👤</span>`;
+        }
+        
+        // Reattach event listener to the new element inside the container
+        document.getElementById('userAvatarTrigger').addEventListener('click', function() {
+            document.getElementById('userMenu').classList.toggle('active');
+            markNotificationsAsRead();
+        });
+        // --- END AVATAR DISPLAY LOGIC ---
+        
+        // Display role-specific links
+        if (currentUser.role === 'jobseeker') {
+          document.querySelectorAll('.user-seeker-link').forEach(el => el.style.display = 'inline-block');
+        } else if (currentUser.role === 'company') {
+          document.querySelectorAll('.user-company-link').forEach(el => el.style.display = 'inline-block');
+        } else if (currentUser.role === 'admin') {
+          document.querySelector('.user-admin-link').style.display = 'inline-block';
+          document.querySelectorAll('.user-seeker-link').forEach(el => el.style.display = 'inline-block');
+        }
+
+      } else {
+        guestView.style.display = 'block';
+        userView.style.display = 'none';
+        profileContainer.style.display = 'none'; // Hide profile container for guests
+      }
+    }
+
+    // Close user menu when clicking elsewhere
+    document.addEventListener('click', function(event) {
+      const userMenu = document.getElementById('userMenu');
+      const avatarTrigger = document.getElementById('userAvatarContainer');
+      
+      if (avatarTrigger && !avatarTrigger.contains(event.target) && !userMenu.contains(event.target)) {
+        userMenu.classList.remove('active');
+      }
+    });
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('currentUser');
+      window.location.reload();
+    });
+    
+    // Mark notifications as read
+    function markNotificationsAsRead() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      if (!currentUser) return;
+
+      let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+      let updatedNotifications = notifications.map(n => {
+        if (n.userId === currentUser.id && !n.read) {
+          n.read = true;
+        }
+        return n;
+      });
+
+      localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+      updateNotificationBadge(); // Update the badge immediately after marking as read
+    }
+
+    // Update notification badge
+    function updateNotificationBadge() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      if (!currentUser) return;
+      
+      const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+      const userNotifications = notifications.filter(n => n.userId === currentUser.id && !n.read);
+      
+      const badge = document.getElementById('notificationBadge');
+      if (userNotifications.length > 0) {
+        badge.textContent = userNotifications.length;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Initialize (Clean)
+    document.addEventListener('DOMContentLoaded', function() {
+      checkLoginStatus();
+    });
+  </script>
+</body>
+</html>

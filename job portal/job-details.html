@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Details</title>
+  <link rel="icon" type="image/png" href="Images/icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body {
+      background: url("Images/bg2.jpg") no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 50px;
+      padding-bottom: 50px;
+    }
+
+    .background-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .details-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .job-title {
+      color: #4B3621;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .job-meta {
+      color: #A9746E;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      color: #4B3621;
+      font-weight: 600;
+      border-bottom: 2px solid #A9746E;
+      padding-bottom: 5px;
+      margin-top: 20px;
+      margin-bottom: 15px;
+    }
+
+    .btn-apply {
+      background: linear-gradient(to right, #4B3621, #A9746E);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-apply:hover {
+      box-shadow: 0 8px 15px rgba(75,54,33,0.5);
+      transform: scale(1.02);
+    }
+    
+    .btn-back {
+      background-color: #8d6e63;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background-overlay"></div>
+  <div class="content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <div class="details-card">
+            <div id="jobDetailsContent">
+              <h2 id="jobTitle" class="job-title"></h2>
+              <p id="jobCompanyMeta" class="job-meta"></p>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                <button id="applyButton" class="btn btn-apply me-md-2" type="button">Apply Now</button>
+                <a href="search-job.html" class="btn btn-outline-secondary btn-back" type="button"><i class="bi bi-arrow-left"></i> Back to Search</a>
+              </div>
+
+              <h4 class="section-title">Job Description</h4>
+              <pre id="jobDescription" class="card-text" style="white-space: pre-wrap; font-family: inherit; font-size: 1rem;"></pre>
+
+              <h4 class="section-title">Requirements</h4>
+              <pre id="jobRequirements" class="card-text" style="white-space: pre-wrap; font-family: inherit; font-size: 1rem;"></pre>
+
+              <h4 class="section-title">Contact Information</h4>
+              <p id="jobContact"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const job = JSON.parse(localStorage.getItem('viewingJob'));
+      const contentDiv = document.getElementById('jobDetailsContent');
+      
+      if (!job) {
+        contentDiv.innerHTML = '<div class="text-center"><h4>Job not found.</h4><a href="search-job.html" class="btn btn-back">Browse Jobs</a></div>';
+        return;
+      }
+
+      // Populate content
+      document.getElementById('jobTitle').textContent = job.title;
+      document.getElementById('jobCompanyMeta').innerHTML = `${job.company} | ${job.location} | <strong style="color: #4B3621;">Rs. ${job.salary}</strong>`;
+      document.getElementById('jobDescription').textContent = job.description || 'No description provided.';
+      document.getElementById('jobRequirements').textContent = job.requirements || 'No specific requirements listed.';
+      document.getElementById('jobContact').textContent = job.contact || 'Contact information not available.';
+
+      // Apply button functionality
+      document.getElementById('applyButton').addEventListener('click', function() {
+        // Store the ID of the job being applied for
+        localStorage.setItem("selectedJobId", job.id);
+        window.location.href = "apply-job.html";
+      });
+    });
+  </script>
+</body>
+</html>
